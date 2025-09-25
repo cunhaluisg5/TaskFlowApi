@@ -14,6 +14,17 @@ const registrarUsuario = async (nome, email, senha) => {
   }
 }
 
+const login = async (idToken) => {
+  try{
+    const login = await auth.verifyIdToken(idToken);
+
+    return login;
+  }catch(err){
+    throw err;
+  }
+}
+
 export default {
-    registrarUsuario
+    registrarUsuario,
+    login
 }
