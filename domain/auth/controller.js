@@ -52,6 +52,39 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.get('/profile', async (req, res) => {
+    try {
+      const authHeader = req.headers['authorization'] || req.headers['Authorization'];
+  
+      if (!validaParametro(authHeader)) {
+        return formataRetorno(res, 401, 'TOKEN é obrigatório.');
+      }
+
+      const idToken = authHeader.split(' ')[1];
+
+      if(!validaParametro(idToken)){
+        return formataRetorno(res, 401, 'TOKEN inválido.');
+      }
+
+      const user = await service.buscarPerfil(idToken);
+
+      const objectUser = {
+        uid: user.uid,
+        nome: user.displayName,
+        email: user.email,
+        emailVerificado: user.emailVerified,
+        foto: user.photoURL,
+        criadoEm: user.metadata.creationTime,
+        ultimoLogin: user.metadata.lastSignInTime
+      }
+
+      return res.status(200).json(objectUser);
+    } catch (error) {
+        console.log(error);
+        return formataRetorno(res, 500, error.message);
+    }
+});
+
 router.post('/token-teste', async (req, res) => {
     try {
       const { uid } = req.body;

@@ -24,7 +24,19 @@ const login = async (idToken) => {
   }
 }
 
+const buscarPerfil = async (idToken) => {
+  try{
+      const decodedToken = await auth.verifyIdToken(idToken);
+      const uid = decodedToken.uid;
+      const user  = await auth.getUser(uid);
+      return user;
+  }catch(err){
+    throw err;
+  }
+}
+
 export default {
     registrarUsuario,
-    login
+    login,
+    buscarPerfil
 }
