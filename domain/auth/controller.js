@@ -10,16 +10,8 @@ router.post('/register', async (req, res) => {
     try {
       const { nome, email, senha } = req.body;
 
-      if(!validaParametro(nome)){
-        return formataRetorno(res, 401, 'NOME é obrigatório.');
-      }
-
-      if(!validaParametro(email)){
-        return formataRetorno(res, 401, 'EMAIL é obrigatório.');
-      }
-
-      if(!validaParametro(senha)){
-        return formataRetorno(res, 401, 'SENHA é obrigatória.');
+      if(!validaParametro(nome) || !validaParametro(email) || !validaParametro(senha)){
+        return formataRetorno(res, 401, 'Existem parâmetros obrigatórios que estão ausentes.');
       }
 
       const usuario  = await service.registrarUsuario(nome, email, senha);
