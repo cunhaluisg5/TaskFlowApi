@@ -1,6 +1,8 @@
 import express from 'express';
+
 import service from './service.js';
 import service_token from './service-token.js';
+import authMiddleware from '../../middleware/auth.js';
 
 const router = express.Router();
 
@@ -29,21 +31,9 @@ router.post('/register', async (req, res) => {
     }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', authMiddleware, async (req, res) => {
     try {
-      const authHeader = req.headers['authorization'] || req.headers['Authorization'];
-  
-      if (!validaParametro(authHeader)) {
-        return formataRetorno(res, 401, 'TOKEN é obrigatório.');
-      }
-
-      const idToken = authHeader.split(' ')[1];
-
-      if(!validaParametro(idToken)){
-        return formataRetorno(res, 401, 'TOKEN inválido.');
-      }
-
-      const usuario  = await service.login(idToken);
+      const usuario  = await service.login(req.idToken);
 
       return res.status(200).json(usuario);
     } catch (error) {
@@ -52,21 +42,9 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.get('/profile', async (req, res) => {
+router.get('/profile', authMiddleware, async (req, res) => {
     try {
-      const authHeader = req.headers['authorization'] || req.headers['Authorization'];
-  
-      if (!validaParametro(authHeader)) {
-        return formataRetorno(res, 401, 'TOKEN é obrigatório.');
-      }
-
-      const idToken = authHeader.split(' ')[1];
-
-      if(!validaParametro(idToken)){
-        return formataRetorno(res, 401, 'TOKEN inválido.');
-      }
-
-      const user = await service.buscarPerfil(idToken);
+      const user = await service.buscarPerfil(req.idToken);
 
       const objectUser = {
         uid: user.uid,
@@ -79,6 +57,20 @@ router.get('/profile', async (req, res) => {
       }
 
       return res.status(200).json(objectUser);
+    } catch (error) {
+        console.log(error);
+        return formataRetorno(res, 500, error.message);
+    }
+});
+
+router.put('/profile', authMiddleware, async (req, res) => {
+    try {
+      const { uid } = req;
+      const { displayName, email, photoURL, password } = req.body;
+
+      const user = await service.atualizarPerfil(uid, displayName, email, photoURL, password);
+
+      return res.status(200).json(user);
     } catch (error) {
         console.log(error);
         return formataRetorno(res, 500, error.message);

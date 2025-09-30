@@ -35,8 +35,23 @@ const buscarPerfil = async (idToken) => {
   }
 }
 
+const atualizarPerfil = async (uid, displayName, email, photoURL, password) => {
+  try{
+      const user = await auth.updateUser(uid, {
+        displayName,
+        email,
+        photoURL,
+        password
+      });
+      return user;
+  }catch(err){
+    throw err;
+  }
+}
+
 export default {
     registrarUsuario,
     login,
-    buscarPerfil
+    buscarPerfil,
+    atualizarPerfil
 }
