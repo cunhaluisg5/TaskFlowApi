@@ -100,9 +100,33 @@ const atualizarTask = async (uid, id, title, description, completed) => {
   }
 }
 
+const apagarTask = async (uid, id) => {
+  try{
+      const taskRef = db.collection('tasks').doc(id);
+      const doc = await taskRef.get();
+
+      if (!doc.exists) {
+        return null;
+      }
+
+      const task = { id: doc.id, ...doc.data() };
+
+      if (task.uid !== uid) {
+        return null;
+      }
+
+      await taskRef.delete();
+
+      return task;
+  }catch(err){
+    throw err;
+  }
+}
+
 export default {
     cadastrarTask,
     buscarTasks,
     buscarTaskPorId,
-    atualizarTask
+    atualizarTask,
+    apagarTask
 }
