@@ -18,6 +18,29 @@ const cadastrarTask = async (uid, title, description) => {
   }
 }
 
+const buscarTasks = async (uid, status) => {
+  try{
+      status = status === 'true'; 
+      let tasksRef = db.collection('tasks').where('completed', '==', status);
+
+      if (uid) {
+        tasksRef = tasksRef.where('uid', '==', uid);
+      }
+
+      const snapshot = await tasksRef.get();
+
+      const tasks = [];
+      snapshot.forEach(doc => {
+        tasks.push({ id: doc.id, ...doc.data() });
+      });
+
+      return tasks;
+  }catch(err){
+    throw err;
+  }
+}
+
 export default {
-    cadastrarTask
+    cadastrarTask,
+    buscarTasks
 }

@@ -23,6 +23,24 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 });
 
+router.get('/', authMiddleware, async (req, res) => {
+    try {
+      const { uid } = req;
+      const { status } = req.query;
+
+      if(!validaParametro(status)){
+        return formataRetorno(res, 401, 'Existem parâmetros obrigatórios que estão ausentes.');
+      }
+
+      const task = await service.buscarTasks(uid, status);
+
+      return res.status(200).json(task);
+    } catch (error) {
+        console.log(error);
+        return formataRetorno(res, 500, error.message);
+    }
+});
+
 const validaParametro = (parametro) => {
   return parametro != undefined && parametro != null && parametro.trim() != '';
 }
