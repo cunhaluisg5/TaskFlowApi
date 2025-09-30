@@ -21,7 +21,11 @@ const cadastrarTask = async (uid, title, description) => {
 const buscarTasks = async (uid, status) => {
   try{
       status = status === 'true'; 
-      let tasksRef = db.collection('tasks').where('completed', '==', status);
+      let tasksRef = db.collection('tasks');
+
+      if(status){
+        tasksRef = db.collection('tasks').where('completed', '==', status);
+      }
 
       if (uid) {
         tasksRef = tasksRef.where('uid', '==', uid);
@@ -60,8 +64,45 @@ const buscarTaskPorId = async (uid, id) => {
   }
 };
 
+const atualizarTask = async (uid, id, title, description, completed) => {
+  try{
+      const taskRef = db.collection('tasks').doc(id);
+      const doc = await taskRef.get();
+
+      if (!doc.exists) {
+        return null;
+      }
+
+      const task = { id: doc.id, ...doc.data() };
+
+      if (task.uid !== uid) {
+        return null;
+      }
+
+      const camposAtualizaveis = {};
+      if (title !== undefined) camposAtualizaveis.title = title;
+      if (description !== undefined) camposAtualizaveis.description = description;
+      if (completed !== undefined) camposAtualizaveis.completed = completed;
+
+      if(Object.values(camposAtualizaveis).length == 0){
+        return null;
+      }
+
+      camposAtualizaveis.updatedAt = new Date().toISOString();
+
+      await taskRef.update(camposAtualizaveis);
+
+      const docAtualizado = await taskRef.get();
+
+      return docAtualizado;
+  }catch(err){
+    throw err;
+  }
+}
+
 export default {
     cadastrarTask,
     buscarTasks,
-    buscarTaskPorId
+    buscarTaskPorId,
+    atualizarTask
 }

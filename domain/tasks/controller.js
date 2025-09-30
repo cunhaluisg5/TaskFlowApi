@@ -28,10 +28,6 @@ router.get('/', authMiddleware, async (req, res) => {
       const { uid } = req;
       const { status } = req.query;
 
-      if(!validaParametro(status)){
-        return formataRetorno(res, 401, 'Existem parâmetros obrigatórios que estão ausentes.');
-      }
-
       const task = await service.buscarTasks(uid, status);
 
       return res.status(200).json(task);
@@ -54,6 +50,25 @@ router.get('/:id', authMiddleware, async (req, res) => {
 
       if(!task){
         return formataRetorno(res, 401, 'Task não encontrada.');
+      }
+
+      return res.status(200).json(task);
+    } catch (error) {
+        console.log(error);
+        return formataRetorno(res, 500, error.message);
+    }
+});
+
+router.put('/:id', authMiddleware, async (req, res) => {
+    try {
+      const { uid } = req;
+      const { id } = req.params;
+      const { title, description, completed } = req.body;
+
+      const task = await service.atualizarTask(uid, id, title, description, completed);
+
+      if(!task){
+        return formataRetorno(res, 401, 'Task não atualizada.');
       }
 
       return res.status(200).json(task);
