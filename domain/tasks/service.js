@@ -40,7 +40,28 @@ const buscarTasks = async (uid, status) => {
   }
 }
 
+const buscarTaskPorId = async (uid, id) => {
+  try {
+    const doc = await db.collection('tasks').doc(id).get();
+
+    if (!doc.exists) {
+      return null;
+    }
+
+    const task = { id: doc.id, ...doc.data() };
+
+    if (task.uid !== uid) {
+      return null;
+    }
+
+    return task;
+  } catch (err) {
+    throw err;
+  }
+};
+
 export default {
     cadastrarTask,
-    buscarTasks
+    buscarTasks,
+    buscarTaskPorId
 }

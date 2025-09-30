@@ -41,6 +41,28 @@ router.get('/', authMiddleware, async (req, res) => {
     }
 });
 
+router.get('/:id', authMiddleware, async (req, res) => {
+    try {
+      const { uid } = req;
+      const { id } = req.params;
+
+      if(!validaParametro(id)){
+        return formataRetorno(res, 401, 'Existem parâmetros obrigatórios que estão ausentes.');
+      }
+
+      const task = await service.buscarTaskPorId(uid, id);
+
+      if(!task){
+        return formataRetorno(res, 401, 'Task não encontrada.');
+      }
+
+      return res.status(200).json(task);
+    } catch (error) {
+        console.log(error);
+        return formataRetorno(res, 500, error.message);
+    }
+});
+
 const validaParametro = (parametro) => {
   return parametro != undefined && parametro != null && parametro.trim() != '';
 }
