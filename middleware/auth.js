@@ -3,14 +3,14 @@ import { auth } from '../config/database.js';
 export default async function authMiddleware(req, res, next){
   const authHeader = req.headers['authorization'] || req.headers['Authorization'];
   
-  if (!validaParametro(authHeader)) {
-    return formataRetorno(res, 401, 'TOKEN é obrigatório.');
+  if (!validateParameter(authHeader)) {
+    return formatReturn(res, 401, 'TOKEN é obrigatório.');
   }
 
   const idToken = authHeader.split(' ')[1];
 
-  if(!validaParametro(idToken)){
-    return formataRetorno(res, 401, 'TOKEN inválido.');
+  if(!validateParameter(idToken)){
+    return formatReturn(res, 401, 'TOKEN inválido.');
   }
 
   const decodedToken = await auth.verifyIdToken(idToken);
@@ -22,10 +22,10 @@ export default async function authMiddleware(req, res, next){
   next();
 }
 
-const validaParametro = (parametro) => {
-  return parametro != undefined && parametro != null && parametro.trim() != '';
+const validateParameter = (parameter) => {
+  return parameter != undefined && parameter != null && parameter.trim() != '';
 }
 
-const formataRetorno = (res, codigo, mensagem) => {
-  res.status(codigo).json({ cod: codigo, msg: mensagem });
+const formatReturn = (res, cod, msg) => {
+  res.status(cod).json({ cod, msg });
 }

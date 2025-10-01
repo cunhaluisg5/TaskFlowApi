@@ -1,6 +1,6 @@
 import { db } from '../../config/database.js';
 
-const cadastrarTask = async (uid, title, description) => {
+const registerTask = async (uid, title, description) => {
   try{
       const newTask = {
         title,
@@ -10,7 +10,7 @@ const cadastrarTask = async (uid, title, description) => {
         completed: false
       };
 
-      const docRef = await db.collection("tasks").add(newTask);
+      const docRef = await db.collection('tasks').add(newTask);
 
       return docRef;
   }catch(err){
@@ -18,7 +18,7 @@ const cadastrarTask = async (uid, title, description) => {
   }
 }
 
-const buscarTasks = async (uid, status) => {
+const searchTasks = async (uid, status) => {
   try{
       status = status === 'true'; 
       let tasksRef = db.collection('tasks');
@@ -44,7 +44,7 @@ const buscarTasks = async (uid, status) => {
   }
 }
 
-const buscarTaskPorId = async (uid, id) => {
+const searchTaskById = async (uid, id) => {
   try {
     const doc = await db.collection('tasks').doc(id).get();
 
@@ -64,7 +64,7 @@ const buscarTaskPorId = async (uid, id) => {
   }
 };
 
-const atualizarTask = async (uid, id, title, description, completed) => {
+const updateTask = async (uid, id, title, description, completed) => {
   try{
       const taskRef = db.collection('tasks').doc(id);
       const doc = await taskRef.get();
@@ -79,28 +79,28 @@ const atualizarTask = async (uid, id, title, description, completed) => {
         return null;
       }
 
-      const camposAtualizaveis = {};
-      if (title !== undefined) camposAtualizaveis.title = title;
-      if (description !== undefined) camposAtualizaveis.description = description;
-      if (completed !== undefined) camposAtualizaveis.completed = completed;
+      const updatableFields = {};
+      if (title !== undefined) updatableFields.title = title;
+      if (description !== undefined) updatableFields.description = description;
+      if (completed !== undefined) updatableFields.completed = completed;
 
-      if(Object.values(camposAtualizaveis).length == 0){
+      if(Object.values(updatableFields).length == 0){
         return null;
       }
 
-      camposAtualizaveis.updatedAt = new Date().toISOString();
+      updatableFields.updatedAt = new Date().toISOString();
 
-      await taskRef.update(camposAtualizaveis);
+      await taskRef.update(updatableFields);
 
-      const docAtualizado = await taskRef.get();
+      const docUpdated = await taskRef.get();
 
-      return docAtualizado;
+      return docUpdated;
   }catch(err){
     throw err;
   }
 }
 
-const apagarTask = async (uid, id) => {
+const deleteTask = async (uid, id) => {
   try{
       const taskRef = db.collection('tasks').doc(id);
       const doc = await taskRef.get();
@@ -124,9 +124,9 @@ const apagarTask = async (uid, id) => {
 }
 
 export default {
-    cadastrarTask,
-    buscarTasks,
-    buscarTaskPorId,
-    atualizarTask,
-    apagarTask
+    registerTask,
+    searchTasks,
+    searchTaskById,
+    updateTask,
+    deleteTask
 }

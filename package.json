@@ -1,7 +1,7 @@
 {
   "name": "taskflowapi",
   "version": "1.0.0",
-  "description": "Api do TaskFlow",
+  "description": "Api TaskFlow",
   "main": "index.js",
   "type": "module",
   "scripts": {

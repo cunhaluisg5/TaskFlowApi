@@ -10,16 +10,16 @@ router.post('/', authMiddleware, async (req, res) => {
       const { uid } = req;
       const { title, description } = req.body;
 
-      if(!validaParametro(title) || !validaParametro(description)){
-        return formataRetorno(res, 401, 'Existem parâmetros obrigatórios que estão ausentes.');
+      if(!validateParameter(title) || !validateParameter(description)){
+        return formatReturn(res, 401, 'Existem parâmetros obrigatórios que estão ausentes.');
       }
 
-      const task = await service.cadastrarTask(uid, title, description);
+      const task = await service.registerTask(uid, title, description);
 
       return res.status(200).json(task);
     } catch (error) {
         console.log(error);
-        return formataRetorno(res, 500, error.message);
+        return formatReturn(res, 500, error.message);
     }
 });
 
@@ -28,12 +28,12 @@ router.get('/', authMiddleware, async (req, res) => {
       const { uid } = req;
       const { status } = req.query;
 
-      const task = await service.buscarTasks(uid, status);
+      const task = await service.searchTasks(uid, status);
 
       return res.status(200).json(task);
     } catch (error) {
         console.log(error);
-        return formataRetorno(res, 500, error.message);
+        return formatReturn(res, 500, error.message);
     }
 });
 
@@ -42,20 +42,20 @@ router.get('/:id', authMiddleware, async (req, res) => {
       const { uid } = req;
       const { id } = req.params;
 
-      if(!validaParametro(id)){
-        return formataRetorno(res, 401, 'Existem parâmetros obrigatórios que estão ausentes.');
+      if(!validateParameter(id)){
+        return formatReturn(res, 401, 'Existem parâmetros obrigatórios que estão ausentes.');
       }
 
-      const task = await service.buscarTaskPorId(uid, id);
+      const task = await service.searchTaskById(uid, id);
 
       if(!task){
-        return formataRetorno(res, 401, 'Task não encontrada.');
+        return formatReturn(res, 401, 'Task não encontrada.');
       }
 
       return res.status(200).json(task);
     } catch (error) {
         console.log(error);
-        return formataRetorno(res, 500, error.message);
+        return formatReturn(res, 500, error.message);
     }
 });
 
@@ -65,16 +65,16 @@ router.put('/:id', authMiddleware, async (req, res) => {
       const { id } = req.params;
       const { title, description, completed } = req.body;
 
-      const task = await service.atualizarTask(uid, id, title, description, completed);
+      const task = await service.updateTask(uid, id, title, description, completed);
 
       if(!task){
-        return formataRetorno(res, 401, 'Task não atualizada.');
+        return formatReturn(res, 401, 'Task não atualizada.');
       }
 
       return res.status(200).json(task);
     } catch (error) {
         console.log(error);
-        return formataRetorno(res, 500, error.message);
+        return formatReturn(res, 500, error.message);
     }
 });
 
@@ -83,25 +83,25 @@ router.delete('/:id', authMiddleware, async (req, res) => {
       const { uid } = req;
       const { id } = req.params;
 
-      const task = await service.apagarTask(uid, id);
+      const task = await service.deleteTask(uid, id);
 
       if(!task){
-        return formataRetorno(res, 401, 'Task não apagada.');
+        return formatReturn(res, 401, 'Task não apagada.');
       }
 
       return res.status(200).json(task);
     } catch (error) {
         console.log(error);
-        return formataRetorno(res, 500, error.message);
+        return formatReturn(res, 500, error.message);
     }
 });
 
-const validaParametro = (parametro) => {
-  return parametro != undefined && parametro != null && parametro.trim() != '';
+const validateParameter = (parameter) => {
+  return parameter != undefined && parameter != null && parameter.trim() != '';
 }
 
-const formataRetorno = (res, codigo, mensagem) => {
-  res.status(codigo).json({ cod: codigo, msg: mensagem });
+const formatReturn = (res, cod, msg) => {
+  res.status(cod).json({ cod, msg });
 }
 
 export default router;

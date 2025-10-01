@@ -8,68 +8,72 @@ const router = express.Router();
 
 router.post('/register', async (req, res) => {
     try {
-      const { nome, email, senha } = req.body;
+      const { name, email, password } = req.body;
 
-      if(!validaParametro(nome) || !validaParametro(email) || !validaParametro(senha)){
-        return formataRetorno(res, 401, 'Existem parâmetros obrigatórios que estão ausentes.');
+      if(!validateParameter(name) || !validateParameter(email) || !validateParameter(password)){
+        return formatReturn(res, 401, 'Existem parâmetros obrigatórios que estão ausentes.');
       }
 
-      const usuario  = await service.registrarUsuario(nome, email, senha);
+      const user  = await service.registerUser(name, email, password);
 
-      return res.status(200).json(usuario);
+      return res.status(200).json(user);
     } catch (error) {
         console.log(error);
-        return formataRetorno(res, 500, error.message);
+        return formatReturn(res, 500, error.message);
     }
 });
 
 router.post('/login', authMiddleware, async (req, res) => {
     try {
-      const usuario  = await service.login(req.idToken);
+      const user  = await service.login(req.idToken);
 
-      return res.status(200).json(usuario);
+      return res.status(200).json(user);
     } catch (error) {
         console.log(error);
-        return formataRetorno(res, 500, error.message);
+        return formatReturn(res, 500, error.message);
     }
 });
 
 router.get('/profile', authMiddleware, async (req, res) => {
     try {
-      const user = await service.buscarPerfil(req.idToken);
+      const user = await service.searchPerfil(req.idToken);
 
       const objectUser = {
         uid: user.uid,
-        nome: user.displayName,
+        name: user.displayName,
         email: user.email,
-        emailVerificado: user.emailVerified,
-        foto: user.photoURL,
-        criadoEm: user.metadata.creationTime,
-        ultimoLogin: user.metadata.lastSignInTime
+        verifiedEmail: user.emailVerified,
+        photo: user.photoURL,
+        createdAt: user.metadata.creationTime,
+        lastLogin: user.metadata.lastSignInTime
       }
 
       return res.status(200).json(objectUser);
     } catch (error) {
         console.log(error);
-        return formataRetorno(res, 500, error.message);
+        return formatReturn(res, 500, error.message);
     }
 });
 
 router.put('/profile', authMiddleware, async (req, res) => {
     try {
       const { uid } = req;
-      const { displayName, email, photoURL, password } = req.body;
+      const { name, email, photo, password } = req.body;
 
-      const user = await service.atualizarPerfil(uid, displayName, email, photoURL, password);
+      const user = await service.updatePerfil(uid, name, email, photo, password);
+
+      if(!user){
+        return formatReturn(res, 401, 'Perfil não foi atualizado.');
+      }
 
       return res.status(200).json(user);
     } catch (error) {
         console.log(error);
-        return formataRetorno(res, 500, error.message);
+        return formatReturn(res, 500, error.message);
     }
 });
 
-router.post('/token-teste', async (req, res) => {
+router.post('/token-test', async (req, res) => {
     try {
       const { uid } = req.body;
 
@@ -78,16 +82,16 @@ router.post('/token-teste', async (req, res) => {
       return res.status(200).json(token);
     } catch (error) {
         console.log(error);
-        return formataRetorno(res, 500, error.message);
+        return formatReturn(res, 500, error.message);
     }
 });
 
-const validaParametro = (parametro) => {
+const validateParameter = (parametro) => {
   return parametro != undefined && parametro != null && parametro.trim() != '';
 }
 
-const formataRetorno = (res, codigo, mensagem) => {
-  res.status(codigo).json({ cod: codigo, msg: mensagem });
+const formatReturn = (res, cod, msg) => {
+  res.status(cod).json({ cod, msg });
 }
 
 export default router;

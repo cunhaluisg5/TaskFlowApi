@@ -1,14 +1,14 @@
 import { auth } from '../../config/database.js';
 
-const registrarUsuario = async (nome, email, senha) => {
+const registerUser = async (name, email, password) => {
   try{
-    const usuario = await auth.createUser({
-      email: email,
-      password: senha,
-      displayName: nome
+    const user = await auth.createUser({
+      email,
+      password,
+      displayName: name
     });
 
-    return usuario;
+    return user;
   }catch(err){
     throw err;
   }
@@ -24,34 +24,40 @@ const login = async (idToken) => {
   }
 }
 
-const buscarPerfil = async (idToken) => {
+const searchPerfil = async (idToken) => {
   try{
-      const decodedToken = await auth.verifyIdToken(idToken);
-      const uid = decodedToken.uid;
-      const user  = await auth.getUser(uid);
-      return user;
+    const decodedToken = await auth.verifyIdToken(idToken);
+    const uid = decodedToken.uid;
+    const user  = await auth.getUser(uid);
+    return user;
   }catch(err){
     throw err;
   }
 }
 
-const atualizarPerfil = async (uid, displayName, email, photoURL, password) => {
+const updatePerfil = async (uid, name, email, photo, password) => {
   try{
-      const user = await auth.updateUser(uid, {
-        displayName,
-        email,
-        photoURL,
-        password
-      });
-      return user;
+    const updatableFields = {};
+
+    if (name !== '') updatableFields.displayName = name;
+    if (email !== '') updatableFields.email = email;
+    if (photo !== '') updatableFields.photoURL = photo;
+    if (password !== '') updatableFields.password = password;
+
+    if(Object.values(updatableFields).length == 0){
+      return null;
+    }
+    
+    const user = await auth.updateUser(uid, updatableFields);
+    return user;
   }catch(err){
     throw err;
   }
 }
 
 export default {
-    registrarUsuario,
+    registerUser,
     login,
-    buscarPerfil,
-    atualizarPerfil
+    searchPerfil,
+    updatePerfil
 }
