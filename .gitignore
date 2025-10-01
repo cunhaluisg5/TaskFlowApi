@@ -3,3 +3,4 @@ temporario
 logs
 /config/firebase-key.json
 /domain/auth/service-token.js
+.env
