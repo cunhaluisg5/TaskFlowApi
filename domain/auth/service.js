@@ -1,4 +1,6 @@
 import { auth } from '../../config/database.js';
+import axios from 'axios';
+import 'dotenv/config';
 
 const registerUser = async (name, email, password) => {
   try{
@@ -14,11 +16,28 @@ const registerUser = async (name, email, password) => {
   }
 }
 
-const login = async (idToken) => {
+const authenticate = async (idToken) => {
   try{
     const login = await auth.verifyIdToken(idToken);
-
     return login;
+  }catch(err){
+    throw err;
+  }
+}
+
+const login = async (email, password) => {
+  try{
+    const loginResponse = await loginWithEmailPassword(email, password);
+    const { idToken } = loginResponse;
+    const decoded = await auth.verifyIdToken(idToken);
+    return {
+      message: 'Login realizado com sucesso!',
+      user: {
+        uid: decoded.uid,
+        email: decoded.email,
+      },
+      token: `Bearer ${idToken}`
+    }
   }catch(err){
     throw err;
   }
@@ -55,9 +74,22 @@ const updatePerfil = async (uid, name, email, photo, password) => {
   }
 }
 
+const loginWithEmailPassword = async ( email, password) => {
+  const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.API_KEY}`;
+
+  const response = await axios.post(url, {
+    email,
+    password,
+    returnSecureToken: true,
+  });
+
+  return response.data;
+}
+
 export default {
     registerUser,
     login,
     searchPerfil,
-    updatePerfil
+    updatePerfil,
+    authenticate
 }

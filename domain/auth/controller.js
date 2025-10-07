@@ -23,15 +23,28 @@ router.post('/register', async (req, res) => {
     }
 });
 
-router.post('/login', authMiddleware, async (req, res) => {
+router.post('/authenticate', authMiddleware, async (req, res) => {
     try {
-      const user  = await service.login(req.idToken);
+      const user  = await service.authenticate(req.idToken);
 
       return res.status(200).json(user);
     } catch (error) {
         console.log(error);
         return formatReturn(res, 500, error.message);
     }
+});
+
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await service.login(email, password);
+
+    return res.status(200).json(user); 
+  } catch (error) {
+      console.log(error);
+      return formatReturn(res, 500, error.message);
+  }
 });
 
 router.get('/profile', authMiddleware, async (req, res) => {

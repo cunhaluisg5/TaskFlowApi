@@ -47,8 +47,7 @@ O servidor será iniciado em `http://localhost:1000`.
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
 | POST   | /auth/register | Cadastra um novo usuário |
-| POST   | /auth/authenticate    | Realiza autenticação do usuário |
-| POST   | /auth/login    | Realiza login do usuário com email e senha |
+| POST   | /auth/login    | Realiza login do usuário |
 | GET    | /auth/token-test | Gera um token para teste |
 | GET    | /auth/profile  | Busca perfil do usuário logado |
 | PUT    | /auth/profile  | Atualiza perfil do usuário |
