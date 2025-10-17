@@ -19,30 +19,36 @@ const registerTask = async (uid, title, description) => {
 }
 
 const searchTasks = async (uid, status) => {
-  try{
-      status = status === 'true'; 
-      let tasksRef = db.collection('tasks');
+  try {
+    let tasksRef = db.collection('tasks');
 
-      if(status){
-        tasksRef = db.collection('tasks').where('completed', '==', status);
-      }
+    if (status === 'true' || status === 'false') {
+      const completed = status === 'true';
+      tasksRef = tasksRef.where('completed', '==', completed);
+    }
 
-      if (uid) {
-        tasksRef = tasksRef.where('uid', '==', uid);
-      }
+    if (uid) {
+      tasksRef = tasksRef.where('uid', '==', uid);
+    }
 
-      const snapshot = await tasksRef.get();
+    const snapshot = await tasksRef.get();
 
-      const tasks = [];
-      snapshot.forEach(doc => {
-        tasks.push({ id: doc.id, ...doc.data() });
-      });
+    const tasks = [];
+    snapshot.forEach(doc => {
+      tasks.push({ id: doc.id, ...doc.data() });
+    });
 
-      return tasks;
-  }catch(err){
+    tasks.sort((a, b) => {
+      const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+      const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+      return dateB - dateA;
+    });
+
+    return tasks;
+  } catch (err) {
     throw err;
   }
-}
+};
 
 const searchTaskById = async (uid, id) => {
   try {
